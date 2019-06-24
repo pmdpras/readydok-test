@@ -1,0 +1,61 @@
+version: '3.2'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/gabung/Dockerfile
+    container_name: web
+    #user: "1000:1000"
+    ports:
+      - "80:80"
+    volumes:
+      - ./public:/code
+      - ./public:/var/www/html
+    links:
+      - db
+
+#  php:
+#    build:
+#      context: .
+#      dockerfile: docker/php/Dockerfile
+#    container_name: php
+ #   volumes:
+ #     - ./public:/code
+ #     - ./public:/var/www/html
+ #   expose:
+ #     - "80"
+ #   ports:
+ #     - "80:80"
+ #  links:
+ #     - db
+
+  db:
+    image: mariadb:10.2
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: pmd
+      MYSQL_PASSWORD: permadi
+      MYSQL_DATABASE: tes
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    environment:
+      PMA_ARBITRARY: 1
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USERNAME: pmd
+      PMA_HOST: db
+      MYSQL_PASSWORD: permadi
+      restart: always
+    ports: 
+      - "8000:80"
+    depends_on: 
+      - db 
+    links: 
+      - db
